@@ -40,7 +40,7 @@ namespace HomeConf {
 
 
         public string[] ExtractParams(string[] paramArray) {
-            // finds and removes --config="..." from params ... 
+            // finds and removes --config=filename from params ... 
             // '=' may have spaces on either side, or may be replaced by a space
             // future might also take --SET:<param>=<value> or something
 
@@ -52,10 +52,8 @@ namespace HomeConf {
             if (paramArray == null || paramArray.Length == 0)
                 return paramArray;
 
-            //var partA   = new Regex(@"^\s*(--config|-c)", RegexOptions.IgnoreCase);
-            //var partAB  = new Regex(@"^\s*--config(<sep>?\s*\=\s*|\s*)", RegexOptions.IgnoreCase);
-            var partABC = new Regex(@"^[\t ]*(?<config>--config|-c)((?<sep>[\t ]*\=[\t ]*|[\t ]*)(?<filename>[^\= \t\n\r\v\f].*)?)?[\t ]*$", RegexOptions.IgnoreCase);
-            var partBC  = new Regex(@"^[\t ]*((?<sep>[\t ]*\=[\t ]*|[\t ]*)(?<filename>[^\= \t\n\r\v\f].*)?)?[\t ]*$");
+            var partABC = new Regex(@"^[\t ]*(?<config>((--config|-c)([\t ]*\=[\t ]*|[\t ]+|[\t ]*$)))(?<filename>[^\t\n\r\v\f].*?)?[\t ]*$", RegexOptions.IgnoreCase);
+            var partBC  = new Regex(@"^(?<equals>[\t ]*\=)?[\t ]*(?<filename>[^\= \t\n\r\v\f].*?)?[\t ]*$");
             var partC   = new Regex(@"^[\t ]*(?<filename>[^\= \t\n\r\v\f].*?)[\t ]*$"); //NOTE: doens't allow filename to start with an "="
 
             //string partC = @"([""'])(?:(?=(\\?))\2.)*?\1"; // anything between quotes
@@ -71,7 +69,7 @@ namespace HomeConf {
                 var part = partABC; // try to match: --config=blah
                 if (aLoc != -1) {
                     part = partBC;  // try to match: =blah  (--config already matched previously)
-                    if (bLoc != -1)
+                    if (bLoc != -1) 
                         part = partC;
                 }
 
@@ -87,24 +85,24 @@ namespace HomeConf {
                         //return paramArray.Where((val, index) => index != i).ToArray(); // return all but this param
                         return paramArray.Where((val, index) => index != i && index != aLoc && index != bLoc).ToArray();  // everything but the locations of the parameter that we've handled.
 
-                    } else if (match.Groups["sep"].Success) {
-                        // equals or space spearator found but not filename (--config found as well as or found previously)
-                        bLoc = i;
-                        if (aLoc == -1) aLoc = i; // must have found "--config" here too
-
-                        Console.WriteLine("Found <sep>");
-                    } else if (match.Groups["config"].Success) {
+                    } else if (match.Groups["config"].Success) { // only if partABC
                         aLoc = i;
                         Console.WriteLine("Found <config>");
+                        if (match.Groups["config"].Value.TrimEnd().EndsWith("=")) {
+                            bLoc = i;
+                        }
+
+                    } else if (match.Groups["equals"].Success) { // only if partBC
+                        // found equals without filename
+                        bLoc = i;
 
                     } else if (bLoc != -1 || aLoc != -1) {
-                        // error: (aLoc != -1) found "--config" previously but sep and filename not found
-                        // error: (bLoc != -1) found "--config=" but this param was... blank? hard not to match really
+                    // error: (aLoc != -1) found "--config[=]" previously but filename (or lone equals sign) not found
 
-                        Console.WriteLine("Configuration filename missing"); //TODO: throw an error
-                        return paramArray.Where((val, index) => index != aLoc && index != bLoc).ToArray();  // everything but the locations of the parameter that we've handled.
+                    Console.WriteLine("Configuration filename missing"); //TODO: throw an error
+                    return paramArray.Where((val, index) => index != aLoc && index != bLoc).ToArray();  // everything but the locations of the parameter that we've handled.
 
-                    }
+                }
                 }
             }
 
