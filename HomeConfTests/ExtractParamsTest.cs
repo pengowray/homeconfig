@@ -7,7 +7,6 @@ namespace HomeConfTests {
     [TestClass]
     public class ExtractParamsTest {
 
-
         [TestMethod]
         // normal usage:
         [DataRow("--config=config.json", "config.json", "")]
@@ -27,6 +26,12 @@ namespace HomeConfTests {
         [DataRow("--config=\"config.json\"", "config.json", "")]
         [DataRow("--config|\"config.json\"", "config.json", "")]
         [DataRow("-c|\"config.json\"", "config.json", "")]
+
+        // weird caps
+        [DataRow("--CONFIG=Config.json", "Config.json", "")]
+        // "-C" is ignored, only "-c" allowed
+        [DataRow("-C|Config.json", null, "-C|Config.json")]
+        [DataRow("-c|Config.json", "Config.json", "")]
 
         //unlikely usage:
         [DataRow("--config|=|config.json", "config.json", "")]

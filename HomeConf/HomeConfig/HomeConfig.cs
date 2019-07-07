@@ -53,7 +53,7 @@ namespace HomeConf {
                 return paramArray;
 
             //part A: --config B: = c: filename.json
-            var partABC = new Regex(@"^[\t ]*(?<config>((--config|-c)([\t ]*\=[\t ]*|[\t ]+|[\t ]*$)))(?<filename>[^\t\n\r\v\f].*?)?[\t ]*$", RegexOptions.IgnoreCase);
+            var partABC = new Regex(@"^[\t ]*(?<config>((--config|--CONFIG|--Config|-c)([\t ]*\=[\t ]*|[\t ]+|[\t ]*$)))(?<filename>[^\t\n\r\v\f].*?)?[\t ]*$");
             var partBC  = new Regex(@"^(?<equals>[\t ]*\=)?[\t ]*(?<filename>[^\= \t\n\r\v\f].*?)?[\t ]*$");
             var partC   = new Regex(@"^[\t ]*(?<filename>[^\= \t\n\r\v\f].*?)[\t ]*$"); //NOTE: doens't allow filename to start with an "="
 
