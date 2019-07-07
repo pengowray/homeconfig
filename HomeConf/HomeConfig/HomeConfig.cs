@@ -52,13 +52,10 @@ namespace HomeConf {
             if (paramArray == null || paramArray.Length == 0)
                 return paramArray;
 
+            //part A: --config B: = c: filename.json
             var partABC = new Regex(@"^[\t ]*(?<config>((--config|-c)([\t ]*\=[\t ]*|[\t ]+|[\t ]*$)))(?<filename>[^\t\n\r\v\f].*?)?[\t ]*$", RegexOptions.IgnoreCase);
             var partBC  = new Regex(@"^(?<equals>[\t ]*\=)?[\t ]*(?<filename>[^\= \t\n\r\v\f].*?)?[\t ]*$");
             var partC   = new Regex(@"^[\t ]*(?<filename>[^\= \t\n\r\v\f].*?)[\t ]*$"); //NOTE: doens't allow filename to start with an "="
-
-            //string partC = @"([""'])(?:(?=(\\?))\2.)*?\1"; // anything between quotes
-            //var partB = new Regex("=");
-            //var partC = new Regex("");
 
             int aLoc = -1;
             int bLoc = -1;
@@ -79,7 +76,10 @@ namespace HomeConf {
                         // Found
 
                         // TODO: strip quotes
-                        var filename = match.Groups["filename"].Value;
+                        var filename = match.Groups["filename"].Value.Trim(); // should already be trimmed by regex but, to be sure
+                        if (filename.StartsWith('"') && filename.EndsWith('"')) {
+                            filename = filename.Substring(1, filename.Length - 2); // remove first and last (quotation marks)
+                        }
                         ParamConfigFile = filename;
 
                         //return paramArray.Where((val, index) => index != i).ToArray(); // return all but this param
@@ -87,7 +87,7 @@ namespace HomeConf {
 
                     } else if (match.Groups["config"].Success) { // only if partABC
                         aLoc = i;
-                        Console.WriteLine("Found <config>");
+                        //Console.WriteLine("Found <config>");
                         if (match.Groups["config"].Value.TrimEnd().EndsWith("=")) {
                             bLoc = i;
                         }
@@ -99,7 +99,7 @@ namespace HomeConf {
                     } else if (bLoc != -1 || aLoc != -1) {
                     // error: (aLoc != -1) found "--config[=]" previously but filename (or lone equals sign) not found
 
-                    Console.WriteLine("Configuration filename missing"); //TODO: throw an error
+                    //Console.WriteLine("Configuration filename missing"); //TODO: throw an error
                     return paramArray.Where((val, index) => index != aLoc && index != bLoc).ToArray();  // everything but the locations of the parameter that we've handled.
 
                 }

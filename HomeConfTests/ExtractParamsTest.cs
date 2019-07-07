@@ -1,10 +1,71 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 using HomeConf;
 
 namespace HomeConfTests {
     [TestClass]
     public class ExtractParamsTest {
+
+
+        [TestMethod]
+        // normal usage:
+        [DataRow("--config=config.json", "config.json", "")]
+        [DataRow("--config|config.json", "config.json", "")]
+        [DataRow("-c|config.json", "config.json", "")]
+
+        // normal usage plus spaces
+        [DataRow("--config|my space folder\\config.json", "my space folder\\config.json", "")]
+        [DataRow("-c|con space fig.json", "con space fig.json", "")]
+
+        // normal usage + other params
+        [DataRow("--click|-clack|--config=config.json", "config.json", "--click|-clack")]
+        [DataRow("--config=config.json|--click|-clack", "config.json", "--click|-clack")]
+        [DataRow("-pre|--config=config.json|-post", "config.json", "-pre|-post")]
+
+        // normal with quotation marks
+        [DataRow("--config=\"config.json\"", "config.json", "")]
+        [DataRow("--config|\"config.json\"", "config.json", "")]
+        [DataRow("-c|\"config.json\"", "config.json", "")]
+
+        //unlikely usage:
+        [DataRow("--config|=|config.json", "config.json", "")]
+        [DataRow("--config |=|config.json", "config.json", "")]
+        [DataRow("--config|= |config.json", "config.json", "")]
+        [DataRow("--config|=| config.json", "config.json", "")]
+        [DataRow("--config |=|config.json", "config.json", "")]
+        [DataRow("--config | = | config.json", "config.json", "")]
+        [DataRow("--config \t|\t =  |\t config.json", "config.json", "")]
+        [DataRow("--config=|config.json", "config.json", "")]
+        [DataRow("--config= |config.json", "config.json", "")]
+        [DataRow("--config=| config.json  ", "config.json", "")]
+        [DataRow("--config|=config.json", "config.json", "")]
+        [DataRow("--config| =config.json", "config.json", "")]
+        [DataRow("  --config | =config.json", "config.json", "")]
+
+        [DataRow("x|-y|hi|--config=config.json", "config.json", "x|-y|hi")]
+        [DataRow("--config=config.json|x|-y|hi", "config.json", "x|-y|hi")]
+
+        [DataRow("-c config.json", "config.json", "")]
+        [DataRow("-c=config.json", "config.json", "")]
+        [DataRow("-c   config.json", "config.json", "")]
+
+        public void ConfigTestGeneric(string paramsPipeSeparated, string expectedFilename, string expectedRemainingParams) {
+            var conf = new HomeConfig();
+            conf.AppFoldername = "HomeConfigLibraryTests";
+            string[] paramList = paramsPipeSeparated.Split('|');
+            var result = conf.ExtractParams(paramList);
+            Assert.AreEqual(expectedFilename, conf.ParamConfigFile);
+
+            var expectedRem = expectedRemainingParams == ""
+                ? new string[0] // if we expect "" then expect empty array
+                : expectedRemainingParams.Split('|');
+
+            Assert.AreEqual(expectedRem.Length, result.Length);
+            for (int i=0; i< expectedRem.Length; i++) {
+                Assert.AreEqual(expectedRem[i], result[i]);
+            }
+        }
 
         [TestMethod]
         public void ConfigTest1Value() {
