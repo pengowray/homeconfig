@@ -57,7 +57,7 @@ namespace HomeConfTests {
 
         public void ConfigTestGeneric(string paramsPipeSeparated, string expectedFilename, string expectedRemainingParams) {
             var conf = new HomeConfig();
-            conf.AppFoldername = "HomeConfigLibraryTests";
+            conf.AppFolder = "HomeConfigLibraryTests";
             string[] paramList = paramsPipeSeparated.Split('|');
             var result = conf.ExtractParams(paramList);
             Assert.AreEqual(expectedFilename, conf.ParamConfigFile);
@@ -76,7 +76,7 @@ namespace HomeConfTests {
         public void ConfigTest1Value() {
             var conf = new HomeConfig();
             string filename = "test.json";
-            conf.AppFoldername = "HomeConfigLibraryTests";
+            conf.AppFolder = "HomeConfigLibraryTests";
             string[] paramList = { $"--config={filename}"};
             var result = conf.ExtractParams(paramList);
             Assert.AreEqual(filename, conf.ParamConfigFile);
@@ -87,7 +87,7 @@ namespace HomeConfTests {
         public void ConfigTest1ValueExtraArgs() {
             var conf = new HomeConfig();
             string filename = "test.json";
-            conf.AppFoldername = "HomeConfigLibraryTests";
+            conf.AppFolder = "HomeConfigLibraryTests";
             string[] paramList = { "arg0", $"--config={filename}", "arg1" };
             var result = conf.ExtractParams(paramList);
             Assert.AreEqual(filename, conf.ParamConfigFile);
@@ -101,7 +101,7 @@ namespace HomeConfTests {
         public void ConfigTest1ValueNoEquals() {
             var conf = new HomeConfig();
             string filename = "test.json";
-            conf.AppFoldername = "HomeConfigLibraryTests";
+            conf.AppFolder = "HomeConfigLibraryTests";
             string[] paramList = { $"--config {filename}" };
             var result = conf.ExtractParams(paramList);
             Assert.AreEqual(filename, conf.ParamConfigFile);
@@ -113,7 +113,7 @@ namespace HomeConfTests {
         public void ConfigTest1ValueEqualsAndSpaces() {
             var conf = new HomeConfig();
             string filename = "test.json";
-            conf.AppFoldername = "HomeConfigLibraryTests";
+            conf.AppFolder = "HomeConfigLibraryTests";
             string[] paramList = { $"--config = {filename}" };
             var result = conf.ExtractParams(paramList);
             Assert.AreEqual(filename, conf.ParamConfigFile);
@@ -124,7 +124,7 @@ namespace HomeConfTests {
         public void ConfigTest2ValuesEquals() {
             var conf = new HomeConfig();
             string filename = "test.json";
-            conf.AppFoldername = "HomeConfigLibraryTests";
+            conf.AppFolder = "HomeConfigLibraryTests";
             string[] paramList = { "--config=", filename };
             var result = conf.ExtractParams(paramList);
             Assert.AreEqual(filename, conf.ParamConfigFile);
@@ -138,7 +138,7 @@ namespace HomeConfTests {
         public void ConfigTest2ValuesNoEquals() {
             var conf = new HomeConfig();
             string filename = "test.json";
-            conf.AppFoldername = "HomeConfigLibraryTests";
+            conf.AppFolder = "HomeConfigLibraryTests";
             string[] paramList = { "--config", filename };
             var result = conf.ExtractParams(paramList);
             Assert.AreEqual(filename, conf.ParamConfigFile);
@@ -150,7 +150,7 @@ namespace HomeConfTests {
         public void ConfigTest2ValuesEqualsOnOtherSide() {
             var conf = new HomeConfig();
             string filename = "test.json";
-            conf.AppFoldername = "HomeConfigLibraryTests";
+            conf.AppFolder = "HomeConfigLibraryTests";
             string[] paramList = { "--config", $"={filename}" };
             var result = conf.ExtractParams(paramList);
             Assert.AreEqual(filename, conf.ParamConfigFile);
@@ -162,7 +162,7 @@ namespace HomeConfTests {
         public void ConfigTest3Values() {
             var conf = new HomeConfig();
             string filename = "test.json";
-            conf.AppFoldername = "HomeConfigLibraryTests";
+            conf.AppFolder = "HomeConfigLibraryTests";
             string[] paramList = { "--config", "=", filename };
             var result = conf.ExtractParams(paramList);
             Assert.AreEqual(filename, conf.ParamConfigFile);
@@ -175,7 +175,7 @@ namespace HomeConfTests {
         public void ConfigTest3ValuesSpaces() {
             var conf = new HomeConfig();
             string filename = "test.json";
-            conf.AppFoldername = "HomeConfigLibraryTests";
+            conf.AppFolder = "HomeConfigLibraryTests";
             string[] paramList = { "--config ", " = ", filename };
             var result = conf.ExtractParams(paramList);
             Assert.AreEqual(filename, conf.ParamConfigFile);
